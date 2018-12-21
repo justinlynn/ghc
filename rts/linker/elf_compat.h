@@ -31,5 +31,8 @@ enum Reloci386 {
 enum RelocX86_64 {
 #include "ELFRelocs/x86_64.def"
 };
+enum RelocPowerPC64 {
+#include "ELFRelocs/PowerPC64.def"
+};
 
 #endif //RTS_ELF_COMPAT_H
