@@ -381,10 +381,7 @@ ocVerifyImage_ELF ( ObjectCode* oc )
 #endif
       case EM_PPC:   IF_DEBUG(linker,debugBelch( "powerpc32" )); break;
 #if defined(EM_PPC64)
-      case EM_PPC64: IF_DEBUG(linker,debugBelch( "powerpc64" ));
-          errorBelch("%s: RTS linker not implemented on PowerPC 64-bit",
-                     oc->fileName);
-          return 0;
+      case EM_PPC64: IF_DEBUG(linker,debugBelch( "powerpc64" )); break;
 #endif
 #if defined(EM_X86_64)
       case EM_X86_64: IF_DEBUG(linker,debugBelch( "x86_64" )); break;
