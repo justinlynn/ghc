@@ -94,6 +94,10 @@
 
 #if defined(arm_HOST_ARCH) || defined(aarch64_HOST_ARCH)
 #  define NEED_GOT
+#endif
+
+#if defined(arm_HOST_ARCH) || defined(aarch64_HOST_ARCH) \
+    || defined(powerpc64_HOST_ARCH) || defined(powerpc64le_HOST_ARCH)
 #  define NEED_PLT
 #  include "elf_got.h"
 #  include "elf_plt.h"
@@ -369,19 +373,34 @@ ocVerifyImage_ELF ( ObjectCode* oc )
    IF_DEBUG(linker,debugBelch( "Architecture is " ));
    switch (ehdr->e_machine) {
 #if defined(EM_ARM)
-      case EM_ARM:   IF_DEBUG(linker,debugBelch( "arm" )); break;
+       case EM_ARM:
+           IF_DEBUG(linker, debugBelch("arm"));
+           break;
 #endif
-      case EM_386:   IF_DEBUG(linker,debugBelch( "x86" )); break;
+       case EM_386:
+           IF_DEBUG(linker, debugBelch("x86"));
+           break;
 #if defined(EM_SPARC32PLUS)
-      case EM_SPARC32PLUS:
+       case EM_SPARC32PLUS:
 #endif
-      case EM_SPARC: IF_DEBUG(linker,debugBelch( "sparc" )); break;
+       case EM_SPARC:
+           IF_DEBUG(linker, debugBelch("sparc"));
+           break;
 #if defined(EM_IA_64)
-      case EM_IA_64: IF_DEBUG(linker,debugBelch( "ia64" )); break;
+       case EM_IA_64:
+           IF_DEBUG(linker, debugBelch("ia64"));
+           break;
 #endif
-      case EM_PPC:   IF_DEBUG(linker,debugBelch( "powerpc32" )); break;
+       case EM_PPC:
+           IF_DEBUG(linker, debugBelch("powerpc32"));
+           break;
 #if defined(EM_PPC64)
-      case EM_PPC64: IF_DEBUG(linker,debugBelch( "powerpc64" )); break;
+       case EM_PPC64:
+           IF_DEBUG(linker, debugBelch("powerpc64"));
+           if ((ehdr->e_flags & EF_PPC64_ABI) != 2) {
+               errorBelch("%s: RTS linker not implemented for PowerPC 64-bit ELF version 1 semantics. PowerPC 64-bit ELF version 2 support only.", oc->fileName);
+           }
+           break;
 #endif
 #if defined(EM_X86_64)
       case EM_X86_64: IF_DEBUG(linker,debugBelch( "x86_64" )); break;
@@ -966,10 +985,10 @@ end:
    return result;
 }
 
-// the aarch64 linker uses relocacteObjectCodeAarch64,
-// see elf_reloc_aarch64.{h,c}
-#if !defined(aarch64_HOST_ARCH)
-
+// the aarch64/powerpc64 linker uses relocateObjectCode{Aarch64,PowerPC64},
+// see elf_reloc_{aarch64,powerpc64}.{h,c}
+#if defined(aarch64_HOST_ARCH) || defined(powerpc64le_HOST_ARCH) || defined(powerpc64_HOST_ARCH)
+#else
 /* Do ELF relocations which lack an explicit addend.  All x86-linux
    and arm-linux relocations appear to be of this form. */
 static int
@@ -1767,7 +1786,11 @@ ocResolve_ELF ( ObjectCode* oc )
     (void) shdr;
 #endif /* NEED_GOT */
 
-#if defined(aarch64_HOST_ARCH)
+#if defined(aarch64_HOST_ARCH) \
+    || defined(powerpc64_HOST_ARCH) || defined(powerpc64le_HOST_ARCH)
+    /* silence warnings */
+    (void) shnum;
+    (void) shdr;
     /* use new relocation design */
     if(relocateObjectCode( oc ))
         return 0;
@@ -1788,7 +1811,7 @@ ocResolve_ELF ( ObjectCode* oc )
     }
 #endif
 
-#if defined(powerpc_HOST_ARCH)
+#if defined(powerpc_HOST_ARCH) || defined(powerpc64_HOST_ARCH) || defined(powerpc64le_HOST_ARCH)
     ocFlushInstructionCache( oc );
 #endif
 

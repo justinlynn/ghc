@@ -3,10 +3,12 @@
 #include "ghcplatform.h"
 #include <LinkerInternals.h>
 
-#if defined(arm_HOST_ARCH) || defined(aarch64_HOST_ARCH)
+#if defined(arm_HOST_ARCH) || defined(aarch64_HOST_ARCH) \
+    || defined(powerpc64le_HOST_ARCH) || defined(powerpc64_HOST_ARCH)
 
 #include "elf_plt_arm.h"
 #include "elf_plt_aarch64.h"
+#include "elf_plt_powerpc64.h"
 
 #if defined(OBJFORMAT_ELF)
 
@@ -22,6 +24,8 @@
 #define __suffix__ Arm
 #elif defined(__mips__)
 #define __suffix__ Mips
+#elif defined(__powerpc64__)
+#define __suffix__ PowerPC64
 #else
 #error "unknown architecture"
 #endif

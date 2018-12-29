@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include "elf_plt.h"
 
-#if defined(arm_HOST_ARCH) || defined(aarch64_HOST_ARCH)
+#if defined(arm_HOST_ARCH) || defined(aarch64_HOST_ARCH) \
+    || defined(powerpc64_HOST_ARCH) || defined(powerpc64le_HOST_ARCH)
+
 #if defined(OBJFORMAT_ELF)
 
 #define STRINGIFY(x) #x
@@ -19,13 +21,13 @@ numberOfStubsForSection( ObjectCode *oc, unsigned sectionIndex) {
     for(ElfRelocationTable *t = oc->info->relTable; t != NULL; t = t->next)
         if(t->targetSectionIndex == sectionIndex)
             for(size_t i=0; i < t->n_relocations; i++)
-                if(needStubForRel(&t->relocations[i]))
+                if(needStubForRel(oc, sectionIndex, &t->relocations[i]))
                     n += 1;
 
     for(ElfRelocationATable *t = oc->info->relaTable; t != NULL; t = t->next)
         if(t->targetSectionIndex == sectionIndex)
             for(size_t i=0; i < t->n_relocations; i++)
-                if(needStubForRela(&t->relocations[i]))
+                if(needStubForRela(oc, sectionIndex, &t->relocations[i]))
                     n += 1;
     return n;
 }
@@ -89,4 +91,4 @@ freeStubs(Section * section) {
 }
 
 #endif // OBJECTFORMAT_ELF
-#endif // arm/aarch64_HOST_ARCH
+#endif // arm/aarch64/powerpc64/powerpc64le_HOST_ARCH

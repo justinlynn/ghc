@@ -13,6 +13,12 @@ signExtend32(uint32_t bits, uint32_t x)
     return ((int32_t) (x << (32 - bits))) >> (32 - bits);
 }
 
+static inline int64_t
+signExtend64(uint64_t bits, uint64_t x)
+{
+    return ((int64_t) (x << (64 - bits))) >> (64 - bits);
+}
+
 // Does the given signed integer fit into the given bit width?
 static inline bool
 isInt(uint32_t bits, int32_t x)

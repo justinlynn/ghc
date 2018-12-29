@@ -2,8 +2,8 @@
 #include "elf_plt.h"
 
 #if defined(OBJFORMAT_ELF)
-/* we currently only use this abstraction for elf/arm64 */
-#if defined(aarch64_HOST_ARCH)
+/* we currently only use this abstraction for elf/arm64/powerpc64(le) */
+#if defined(aarch64_HOST_ARCH) || defined(powerpc64_HOST_ARCH) || defined(powerpc64le_HOST_ARCH)
 bool
 relocateObjectCode(ObjectCode * oc) {
     return ADD_SUFFIX(relocateObjectCode)(oc);
